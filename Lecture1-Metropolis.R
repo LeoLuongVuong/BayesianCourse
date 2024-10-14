@@ -37,22 +37,22 @@ n_accept <- 0
 sd_prop <- 2.4
 
 # Metropolis loop
-for (i in 2:M){
+for (i in 2:M) {
   theta_prop <- theta[, i - 1] + rmvnorm(n = 1, mean = c(0, 0), 
                                          sigma = sd_prop ^ 2 * Sigma_hat)
-  logr <- lpost(theta_prop) - lpost(theta[,(i-1)])
+  logr <- lpost(theta_prop) - lpost(theta[,(i - 1)])
   u <- runif(1)
-  if(logr >= 0 || u <= exp(logr)){
+  if (logr >= 0 || u <= exp(logr)) {
       theta[,i] <- theta_prop
       n_accept <- n_accept + 1
   } else {
-    theta[,i] <- theta[,i-1]
+    theta[,i] <- theta[,i - 1]
   }
 }
 
 # Exclude warm up
 theta <- theta[,-c(1:burnin)]
-accept_rate <- round(n_accept/(M-1),digits=2) * 100
+accept_rate <- round(n_accept/(M - 1),digits = 2) * 100
 rownames(theta) <- c("alpha", "beta")
 
 # Trace plots
@@ -62,7 +62,7 @@ coda::traceplot(as.mcmc(theta[2,]), main = "beta", col = "darkgreen")
 
 par(mfrow = c(1,2))
 #Histogram of generated samples for alpha
-hist(theta[1,],main="alpha", xlab = "", freq = FALSE, ylim = c(0,0.13))
+hist(theta[1,],main =  "alpha", xlab = "", freq = FALSE, ylim = c(0,0.13))
 lines(density(theta[1,]), type = "l", col = "orange", lwd = 2)
 HPDalpha <- HPDinterval(as.mcmc(t(theta)))[1, ]
 CIalpha <- quantile(theta[1, ], probs = c(0.025, 0.975))
@@ -71,7 +71,7 @@ CIalpha
 abline(v = c(HPDalpha[1], HPDalpha[2]), col = "red", lty = 2)
 
 #Histogram of generated samples for beta
-hist(theta[2,],main="beta", xlab = "", freq = FALSE, ylim = c(0,0.25))
+hist(theta[2,],main = "beta", xlab = "", freq = FALSE, ylim = c(0,0.25))
 lines(density(theta[2,]), type = "l", col = "darkgreen", lwd = 2)
 HPDbeta <- HPDinterval(as.mcmc(t(theta)))[2, ]
 CIbeta <- quantile(theta[2, ], probs = c(0.025, 0.975))
@@ -89,7 +89,7 @@ beta_MCMC <- mean(theta[2,])
 
 par(mfrow = c(1,1))
 wdom <- seq(1.5,2, length = 200)
-pihat <- exp(alpha_hat + beta_hat * wdom) / (1 +exp(alpha_hat + beta_hat * wdom))
+pihat <- exp(alpha_hat + beta_hat * wdom) / (1 + exp(alpha_hat + beta_hat * wdom))
 pihatMetro <- exp(alpha_MCMC + beta_MCMC * wdom) / 
   (1 + exp(alpha_MCMC + beta_MCMC * wdom))
 plot(wdom, pihat, ylab = "Death prob of mice", xlab = "w (virus conc.)", 
